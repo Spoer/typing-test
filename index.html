@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comprehensive Typing Test</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            background-color: #f0f4f8;
+            color: #333;
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 30px;
+        }
+        #controls {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        select, button, input {
+            font-size: 16px;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            background-color: #3498db;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        select:hover, button:hover {
+            background-color: #2980b9;
+        }
+        #text-display {
+            font-size: 18px;
+            margin-bottom: 20px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            text-align: justify;
+            line-height: 1.6;
+            word-wrap: break-word;
+        }
+        #input-field {
+            width: 80%;
+            max-width: 800px;
+            height: 100px;
+            font-size: 16px;
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 2px solid #3498db;
+            border-radius: 5px;
+            resize: none;
+        }
+        #result, #timer {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        .correct { color: #27ae60; }
+        .incorrect { color: #e74c3c; }
+        .current-char { 
+            text-decoration: underline;
+            text-decoration-color: #f1c40f;
+            text-decoration-thickness: 3px;
+        }
+        #custom-chars {
+            width: 80%;
+            max-width: 800px;
+            font-size: 16px;
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 2px solid #3498db;
+            border-radius: 5px;
+            background-color: white;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <h1>Comprehensive Typing Test</h1>
+    <div id="controls">
+        <select id="time-select">
+            <option value="0">No time limit</option>
+            <option value="30">30 seconds</option>
+            <option value="60">60 seconds</option>
+            <option value="120">120 seconds</option>
+        </select>
+        <select id="word-count-select">
+            <option value="25">25 words</option>
+            <option value="50">50 words</option>
+            <option value="100">100 words</option>
+        </select>
+        <select id="difficulty-select">
+            <option value="easy">Easy</option>
+            <option value="intermediate">Intermediate</option>
+            <option value="hard">Hard</option>
+            <option value="expert">Expert</option>
+        </select>
+        <button id="language-switch" onclick="switchLanguage()">Switch to Indonesian</button>
+        <button onclick="startTest()">Start Test</button>
+    </div>
+    <input type="text" id="custom-chars" placeholder="Enter characters to practice (e.g., asdf jkl;) or leave empty for word lists" />
+    <div id="timer"></div>
+    <div id="text-display"></div>
+    <textarea id="input-field" placeholder="Start typing here..." disabled></textarea>
+    <div id="result"></div>
+
+    <script>
+        let startTime, endTime, currentText, timerInterval;
+        let currentLanguage = 'english';
+
+        const wordLists = {
+            english: {
+                easy: ["the", "be", "to", "of", "and", "in", "is", "it", "you", "that", "he", "was", "for", "on", "are", "with", "as", "his", "they", "at", "I", "this", "have", "from", "or", "one", "had", "by", "word", "but", "not", "what", "all", "were", "we", "when", "your", "can", "said", "there", "use", "an", "each", "which", "she", "do", "how", "their", "if", "will", "up", "other", "about", "out", "many", "then", "them", "these", "so", "some", "her", "would", "make", "like", "him", "into", "time", "has", "look", "two", "more", "write", "go", "see", "number", "no", "way", "could", "people", "my", "than", "first", "water", "been", "call", "who", "oil", "its", "now", "find", "long", "down", "day", "did", "get", "come", "made", "may", "part", "over", "new", "sound", "take", "only", "little", "work", "know", "place", "year", "live", "me", "back", "give", "most", "very", "after", "thing", "our", "just", "name", "good", "sentence", "man", "think", "say", "great", "where", "help", "through", "much", "before", "line", "right", "too", "means", "old", "any", "same", "tell", "boy", "follow", "came", "want", "show", "also", "around", "form", "three", "small", "set", "put", "end", "does", "another", "well", "large", "must", "big", "even", "such", "because", "turn", "here", "why", "ask", "went", "men", "read", "need", "land", "different", "home", "us", "move", "try", "kind", "hand", "picture", "again", "change", "off", "play", "spell", "air", "away", "animal", "house", "point", "page", "letter", "mother", "answer", "found", "study", "still", "learn", "should", "America", "world", "high", "every", "near", "add", "food", "between", "own", "below", "country", "plant", "last", "school", "father", "keep", "tree", "never", "start", "city", "earth", "eye", "light", "thought", "head", "under", "story", "saw", "left", "don't", "few", "while", "along", "might", "close", "something", "seem", "next", "hard", "open", "example", "begin", "life", "always", "those", "both", "paper", "together", "got", "group", "often", "run", "important", "until", "children", "side", "feet", "car", "mile", "night", "walk", "white", "sea", "began", "grow", "took", "river", "four", "carry", "state", "once", "book", "hear", "stop", "without", "second", "later", "miss", "idea", "enough", "eat", "face", "watch", "far", "Indian", "real", "almost", "let", "above", "girl", "sometimes", "mountain", "cut", "young", "talk", "soon", "list", "song", "being", "leave", "family", "it's", "body", "music", "color", "stand", "sun", "questions", "fish", "area", "mark", "dog", "horse", "birds", "problem", "complete", "room", "knew", "since", "ever", "piece", "told", "usually", "didn't", "friends", "easy", "heard", "order", "red", "door", "sure", "become", "top", "ship", "across", "today", "during", "short", "better", "best", "however", "low", "hours", "black", "products", "happened", "whole", "measure", "remember", "early", "waves", "reached", "listen", "wind", "rock", "space", "covered", "fast", "several", "hold", "himself", "toward", "five", "step", "morning", "passed", "vowel", "true", "hundred", "against", "pattern", "numeral", "table", "north", "slowly", "money", "map", "farm", "pulled", "draw", "voice", "seen", "cold", "cried", "plan", "notice", "south", "sing", "war", "ground", "fall", "king", "town", "I'll", "unit", "figure", "certain", "field", "travel", "wood"],
+                intermediate: ["quick", "brown", "fox", "jumps", "over", "lazy", "dog", "computer", "keyboard", "screen", "mouse", "printer", "software", "hardware", "internet", "website", "program", "coding", "algorithm", "database"],
+                hard: ["exquisite", "ephemeral", "ubiquitous", "paradigm", "eloquent", "ambiguous", "benevolent", "cacophony", "diligent", "eloquent", "fastidious", "gregarious", "hierarchy", "ideology", "juxtapose", "kinetic", "labyrinth", "meticulous", "nostalgic", "omniscient"],
+                expert: ["surreptitious", "perfidious", "obfuscate", "mellifluous", "perspicacious", "ephemeral", "ubiquitous", "pernicious", "eloquent", "sycophant", "vicissitude", "magnanimous", "idiosyncratic", "euphemism", "quintessential", "paradigm", "benevolent", "esoteric", "ubiquitous", "serendipitous"]
+            },
+            indonesian: {
+                easy: ["dan", "yang", "di", "itu", "dengan", "untuk", "tidak", "ini", "dari", "dalam", "akan", "pada", "saya", "ke", "bisa", "ada", "sudah", "juga", "satu", "tahun", "kalau", "orang", "lagi", "karena", "seperti", "mereka", "kita", "dia", "lebih", "sangat", "waktu", "atau", "sudah", "banyak", "mau", "sebagai", "sama", "baru", "harus", "apa", "pasti", "anak", "sebelum", "nama", "jadi", "masih", "oleh", "antara", "harus", "perlu", "kapan", "kemudian", "mulai", "punya", "tentang", "besar", "tahun", "kerja", "main", "terjadi", "sejak", "kembali", "jauh", "pernah", "hanya", "tinggal", "wajah", "bagian", "ikut", "sehingga", "putih", "merah", "duduk", "kereta", "mobil", "jalan", "tiba", "menjadi", "menyebabkan", "melihat", "mengetahui", "bicara", "begitu", "mengambil", "penuh", "hujan", "gila", "tengah", "langit", "laut", "mendengar", "melakukan", "berjalan", "berbicara", "menulis", "membaca", "meminta", "memakai", "senang", "senyum", "mata", "pintu", "dinding", "jendela", "listrik", "lampu", "sandal", "topi", "kacamata", "sandal", "teman", "adik", "kakak", "nenek", "kakek", "tante", "om", "istri", "suami", "anak-anak", "sepeda", "komputer", "internet", "telepon", "kamera", "buku", "majalah", "koran", "musik", "film", "radio", "televisi", "baju", "celana", "rok", "topi", "jam", "tas", "sepatu", "kaos", "jaket", "tangga", "pohon", "bunga", "tanah", "rumah", "apartemen", "gedung", "kantor", "sekolah", "universitas", "perpustakaan", "toko", "pasar", "warung", "restoran", "hotel", "lapangan", "taman", "kebun", "sungai", "hutan", "pantai", "bukit", "gunung", "pulau", "sawah", "kebun", "hewan", "burung", "ikan", "anjing", "kucing", "kuda", "kambing", "sapi", "domba", "ular", "ayam", "bebek", "angsa", "merpati", "lebah", "kupu-kupu", "belalang", "semut", "nyamuk", "lalat", "kumbang", "labah-labah", "katak", "kodok", "buaya", "monyet", "beruang", "harimau", "singa", "gajah", "zebra", "rusa", "badak", "kerbau", "babi", "keledai", "unta", "jerapah", "kura-kura", "penyu", "hiu", "paus", "lumba-lumba", "ikan pari", "ubur-ubur", "kerang", "siput", "kuda laut", "bintang laut", "gurita", "cumi-cumi", "kepiting", "lobster", "udang"],
+                intermediate: ["cepat", "coklat", "rubah", "melompat", "atas", "malas", "anjing", "komputer", "papan", "ketik", "layar", "tetikus", "pencetak", "perangkat", "lunak", "keras", "internet", "situs", "program", "koding"],
+                hard: ["canggih", "sementara", "ada", "paradigma", "fasih", "ambigu", "murah", "hati", "kakofoni", "rajin", "fasih", "teliti", "ramah", "hirarki", "ideologi", "berdampingan", "kinetik", "labirin", "teliti", "nostalgia"],
+                expert: ["sembunyi-sembunyi", "pengkhianat", "mengaburkan", "merdu", "cerdas", "sementara", "ada", "berbahaya", "fasih", "penjilat", "perubahan", "murah", "hati", "kekhasan", "penghalusan", "penting", "paradigma", "murah", "hati", "rahasia"]
+            }
+        };
+
+        function switchLanguage() {
+            currentLanguage = currentLanguage === 'english' ? 'indonesian' : 'english';
+            const button = document.getElementById('language-switch');
+            button.textContent = currentLanguage === 'english' ? 'Switch to Indonesian' : 'Switch to English';
+        }
+
+        function generateRandomText() {
+            const wordCount = parseInt(document.getElementById('word-count-select').value);
+            const difficulty = document.getElementById('difficulty-select').value;
+            const customChars = document.getElementById('custom-chars').value.toLowerCase().replace(/\s/g, '');
+            
+            let words;
+            if (customChars) {
+                words = [];
+                for (let i = 0; i < wordCount; i++) {
+                    let word = '';
+                    const wordLength = Math.floor(Math.random() * 5) + 3; // Random word length between 3 and 7
+                    for (let j = 0; j < wordLength; j++) {
+                        word += customChars[Math.floor(Math.random() * customChars.length)];
+                    }
+                    words.push(word);
+                }
+            } else {
+                words = wordLists[currentLanguage][difficulty];
+                if (words.length < wordCount) {
+                    words = Array(Math.ceil(wordCount / words.length)).fill(words).flat();
+                }
+                words = words.sort(() => 0.5 - Math.random()).slice(0, wordCount);
+            }
+
+            currentText = words.join(' ');
+            updateTextDisplay();
+            return true;
+        }
+
+        function updateTextDisplay() {
+            const textDisplay = document.getElementById('text-display');
+            textDisplay.innerHTML = currentText.split('').map((char, index) => 
+                `<span id="char-${index}">${char}</span>`
+            ).join('');
+        }
+
+        function startTest() {
+            if (!generateRandomText()) {
+                return;
+            }
+            document.getElementById('result').textContent = '';
+            const inputField = document.getElementById('input-field');
+            const timerDisplay = document.getElementById('timer');
+            
+            inputField.value = '';
+            inputField.disabled = false;
+            inputField.focus();
+
+            startTime = new Date().getTime();
+            const timeLimit = parseInt(document.getElementById('time-select').value);
+            
+            if (timeLimit > 0) {
+                let timeLeft = timeLimit;
+                timerDisplay.textContent = `Time left: ${timeLeft}s`;
+                timerInterval = setInterval(() => {
+                    timeLeft--;
+                    timerDisplay.textContent = `Time left: ${timeLeft}s`;
+                    if (timeLeft <= 0) {
+                        endTest();
+                    }
+                }, 1000);
+            } else {
+                timerDisplay.textContent = 'No time limit';
+            }
+
+            inputField.oninput = handleInput;
+        }
+
+        function handleInput() {
+            const inputField = document.getElementById('input-field');
+            const typedText = inputField.value;
+            let correctChars = 0;
+
+            for (let i = 0; i < currentText.length; i++) {
+                const charElement = document.getElementById(`char-${i}`);
+                if (i < typedText.length) {
+                    if (currentText[i] === typedText[i]) {
+                        charElement.className = 'correct';
+                        correctChars++;
+                    } else {
+                        charElement.className = 'incorrect';
+                    }
+                } else {
+                    charElement.className = i === typedText.length ? 'current-char' : '';
+                }
+            }
+
+            if (typedText.length === currentText.length) {
+                endTest();
+            }
+        }
+
+        function endTest() {
+            clearInterval(timerInterval);
+            endTime = new Date().getTime();
+            const totalTime = (endTime - startTime) / 1000;
+            const charsTyped = document.getElementById('input-field').value.length;
+            const wordsTyped = charsTyped / 5; // Assuming an average word length of 5 characters
+            const wordsPerMinute = Math.round((wordsTyped / totalTime) * 60);
+            const accuracy = Math.round((document.querySelectorAll('.correct').length / currentText.length) * 100);
+            
+            document.getElementById('result').textContent = `Your typing speed: ${wordsPerMinute} WPM | Accuracy: ${accuracy}%`;
+            document.getElementById('input-field').disabled = true;
+            document.getElementById('timer').textContent = 'Test completed';
+        }
+    </script>
+</body>
+</html>
